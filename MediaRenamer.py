@@ -95,6 +95,7 @@ def get_os_date(full_path):
     c_time = get_utc_time(c_time)
     m_time = datetime.fromtimestamp(os.path.getmtime(full_path))
     m_time = get_utc_time(m_time)
+
     # OS date cannot be empty.
     date_taken = min(c_time, m_time)
     return date_taken
