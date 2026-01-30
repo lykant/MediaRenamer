@@ -14,8 +14,12 @@ DT_FORMAT = "%Y:%m:%d %H:%M:%S"
 ISO_FORMAT = "%Y-%m-%d %H:%M:%S"
 YEARS = range(2005, 2027)
 DIR = r"X:\_Media"
-FILE_EXTENSIONS = ["jpg", "heic", "gif", "mov", "mp4", "m4a"]
 SLASH = "\\"
+
+FILE_EXTENSIONS = ["jpg", "heic", "gif", "mov", "mp4", "m4a"]
+EXIF_TAGS = ["DateTimeOriginal", "DateTimeDigitized", "DateTime"]
+FFMPEG_TAGS = ["com.apple.quicktime.creationdate", "creation_time"]
+DICT_TAGS = dict()
 
 
 def concat_full_name(file_name, ext, no=None):
@@ -41,6 +45,14 @@ def date_to_str(date_obj):
 def get_min(value1, value2):
     min_value = min(value1, value2) if value1 and value2 else value1 or value2
     return min_value
+
+
+def get_exif_tags():
+    dict_tag = {}
+    for id, tag in TAGS.items():
+        if tag in EXIF_TAGS:
+            dict_tag |= {tag: id}
+    return dict_tag
 
 
 def get_single_file_names(in_dir, old_name, new_name, ext, no=None):
@@ -102,21 +114,24 @@ def get_os_date(full_path):
 
 
 def get_exif_date(full_path):
+    global DICT_TAGS
     img = Image.open(full_path)
-    exif_data = img.getexif()
+    exif_data = img._getexif()
+    if not exif_data:
+        return None
 
     date_taken = date_exif = None
-    for tag_id, value in exif_data.items():
+    for _, id in DICT_TAGS.items():
+        try:
+            value = exif_data[id]
+        except Exception as e:
+            continue
         value = str(value).strip()
         if not value:
             continue
-        tag = TAGS.get(tag_id, tag_id)
-
-        # Common date tags: DateTimeOriginal (36867), DateTime (306)
-        if tag in ["DateTimeOriginal", "DateTime"]:
-            value = datetime.strptime(str(value), DT_FORMAT)
-            value = get_utc_time(value)
-            date_exif = get_min(date_exif, value)
+        value = datetime.strptime(str(value), DT_FORMAT)
+        value = get_utc_time(value)
+        date_exif = get_min(date_exif, value)
     date_taken = date_exif
     return date_taken
 
@@ -126,7 +141,7 @@ def get_ffmpeg_time(full_path):
     format_tags = probe.get("format", {}).get("tags", {})
 
     date_taken = date_ffmpeg = None
-    for tag in ["com.apple.quicktime.creationdate", "creation_time"]:
+    for tag in FFMPEG_TAGS:
         value = format_tags.get(tag)
         if value:
             value = datetime.fromisoformat(value.replace("Z", "+00:00"))
@@ -190,7 +205,7 @@ def run_media_renamer(dict_folder):
     for folder, files in dict_folder.items():
         for full_name, file_no in files.items():
             i += 1
-            print(f"\n{i:4d}- Processing file: {full_name}")
+            print(f"{i:4d}- Processing file: {full_name}")
             file_name = full_name.split(".", 1)[0]
             file_ext = full_name.split(".", 1)[1].lower()
             if file_ext not in FILE_EXTENSIONS:
@@ -200,13 +215,15 @@ def run_media_renamer(dict_folder):
 
 # Main Execution
 register_heif_opener()
+DICT_TAGS = get_exif_tags()
 
 for yyyy in YEARS:
+    print("\n" + str.center(f"{yyyy}", 80, "*"))
     dir_year = f"{DIR}{SLASH}{yyyy}"
     dict_folder = get_files(dir_year)
     run_media_renamer(dict_folder)
 
-# For Test
+# # For Test
 # dir_year = "C:\\Users\\aykan\\Desktop"
 # dict_folder = get_files(dir_year)
 # run_media_renamer(dict_folder)

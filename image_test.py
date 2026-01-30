@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 
-DIR = f"X:\\_Media"
+DIR = f"X:\\_Media\\2018"
 TXT_WRONG_PLACE = f"X:\\wrong_place.txt"
 TXT_SHORT_NAME = f"X:\\short_files.txt"
 FILE_EXTENSIONS = ["jpg", "heic", "gif", "mov", "mp4", "m4a"]
