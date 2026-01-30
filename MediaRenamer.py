@@ -74,27 +74,6 @@ def get_single_file_names(in_dir, old_name, new_name, ext, no=None):
     return dict_single_file_names
 
 
-def get_files(in_dir):
-    dict_folder = {}
-    for root, _, _ in os.walk(in_dir):
-        dict_files = {}
-        for ext in FILE_EXTENSIONS:
-            result_dir = ""
-            cmd_dir = f'dir /B /on "{root}{SLASH}*.{ext}"'
-            try:
-                result_dir = subprocess.check_output(
-                    cmd_dir, shell=True, text=True, stderr=subprocess.DEVNULL
-                )
-                dict_files |= {
-                    file: i + 1 for i, file in enumerate(result_dir.splitlines())
-                }
-            except subprocess.CalledProcessError as e:
-                continue
-        if len(dict_files) > 0:
-            dict_folder |= {root: dict_files}
-    return dict_folder
-
-
 def get_utc_time(_time):
     if not _time:
         return None
@@ -124,9 +103,9 @@ def get_exif_date(full_path):
     for _, id in DICT_TAGS.items():
         try:
             value = exif_data[id]
+            value = str(value).strip()
         except Exception as e:
             continue
-        value = str(value).strip()
         if not value:
             continue
         value = datetime.strptime(str(value), DT_FORMAT)
@@ -213,6 +192,27 @@ def run_media_renamer(dict_folder):
             process_file(folder, file_name, file_ext, file_no)
 
 
+def get_files(in_dir, c=0):
+    dict_folder = {}
+    for root, _, _ in os.walk(in_dir):
+        dict_files = {}
+        for ext in FILE_EXTENSIONS:
+            result_dir = ""
+            cmd_dir = f'dir /B /o:d "{root}{SLASH}*.{ext}"'
+            try:
+                result_dir = subprocess.check_output(
+                    cmd_dir, shell=True, text=True, stderr=subprocess.DEVNULL
+                )
+                dict_files |= {
+                    file: c + i + 1 for i, file in enumerate(result_dir.splitlines())
+                }
+            except subprocess.CalledProcessError as e:
+                continue
+        if len(dict_files) > 0:
+            dict_folder |= {root: dict_files}
+    return dict_folder
+
+
 # Main Execution
 register_heif_opener()
 DICT_TAGS = get_exif_tags()
@@ -220,8 +220,9 @@ DICT_TAGS = get_exif_tags()
 for yyyy in YEARS:
     print("\n" + str.center(f"{yyyy}", 80, "*"))
     dir_year = f"{DIR}{SLASH}{yyyy}"
-    dict_folder = get_files(dir_year)
-    run_media_renamer(dict_folder)
+    for c in [10000, 0]:
+        dict_folder = get_files(dir_year, c)
+        run_media_renamer(dict_folder)
 
 # # For Test
 # dir_year = "C:\\Users\\aykan\\Desktop"
