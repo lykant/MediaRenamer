@@ -67,7 +67,7 @@ def print_processing_message(meta: meta.Metadata):
 
 
 def print_rename_message(meta: meta.Metadata):
-    """Print a message indicating the file is being renamed."""
+    """Print a message indicating the file is renamed successfully."""
     log.info(
         str.ljust(
             MSG_PREFIX.format(no=meta.no, name=meta.actual_full_name), LENGTH_PREFIX
