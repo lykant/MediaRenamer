@@ -32,7 +32,7 @@ def print_app_footer():
 def print_folder_title(folder: Path):
     """Print a title for the current folder being processed."""
     log.info(cons.EQUAL * cons.LINE_LENGTH)
-    log.info(str.center(f" {folder} ", cons.LINE_LENGTH))
+    log.info(str.center(f" {str(folder).upper()} ", cons.LINE_LENGTH))
 
 
 def print_conflict_title():
