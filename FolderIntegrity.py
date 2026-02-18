@@ -12,23 +12,21 @@ Results are written to:
 """
 
 import os
+import lib.constants as cons
 from pathlib import Path
 
 
-FOLDER = r"X:\_Media"
-TXT_WRONG_PLACE = f"{FOLDER}\\wrong_place.txt"
-TXT_SHORT_NAME = f"{FOLDER}\\short_files.txt"
-
-FILE_EXTENSIONS = ["jpg", "heic", "gif", "mov", "mpg", "mp4", "m4a"]
-MIN_NAME_LENGTH = 15
+FOLDER = cons.BASE
+TXT_WRONG_PLACE = f"{FOLDER}wrong_place.txt"
+TXT_SHORT_NAME = f"{FOLDER}short_files.txt"
 
 
 def is_valid_media_file(file_name: str) -> bool:
     """Return True if the file extension is one of the supported media types."""
-    return file_name.lower().split(".")[-1] in FILE_EXTENSIONS
+    return file_name.lower().split(".")[-1] in cons.FILE_EXTENSIONS
 
 
-def is_short_name(file_name: str, min_length: int = MIN_NAME_LENGTH) -> bool:
+def is_short_name(file_name: str, min_length: int = cons.NAME_LENGTH) -> bool:
     """Return True if the base name (without extension) is shorter than min_length."""
     base = file_name.split(".", 1)[0]
     return len(base) < min_length
@@ -42,7 +40,7 @@ def is_wrong_place(file_name: str, parent_folder: str) -> bool:
     return file_name[:4] != parent_folder[:4]
 
 
-def scan_media_folder(base_folder: str):
+def scan_media_folder(base_folder: Path):
     """
     Walk through the folder recursively and collect:
     - short file names

@@ -35,11 +35,6 @@ from datetime import date
 from itertools import product
 
 
-# Constants
-APP_NAME = Path(__file__).stem
-FILE_EXTENSIONS = ["jpg", "heic", "mov", "mp4", "mpg", "gif", "m4a"]
-
-
 def find_file_date(meta_obj: meta.Metadata) -> Optional[date]:
     """Determine the date taken for a file using EXIF, FFmpeg, and OS timestamps."""
     full_path = meta_obj.actual_full_path
@@ -105,7 +100,7 @@ def search_mutual_names():
     )
 
     # Iterate over each unique date and file extension combination
-    for date_str, ext in product(unique_dates, FILE_EXTENSIONS):
+    for date_str, ext in product(unique_dates, cons.FILE_EXTENSIONS):
         # Filter files that have the same date_taken and extension
         list_mutual = [
             m for m in list_metadata if m.date_taken_str == date_str and m.ext == ext
@@ -165,7 +160,7 @@ def find_file_counts(only_conflicts: bool = cons.NO):
     global list_metadata, dict_file_counts
 
     # Count files per extension
-    for ext in FILE_EXTENSIONS:
+    for ext in cons.FILE_EXTENSIONS:
         if not only_conflicts:
             count = sum(1 for item in list_metadata if item.ext == ext)
         else:
@@ -275,9 +270,10 @@ def fetch_list_metadata(folder: Path, ext: str):
             continue
 
 
-# BASE = Path("X:/_Media")
+# Constants
+APP_NAME = Path(__file__).stem
+
 # YEARS = [2026, 2027]
-BASE = Path("d:/Media/")
 YEARS = []
 CMD_DIR = "dir /B /o:d"
 
@@ -287,7 +283,7 @@ def run_media_renamer():
 
     def run_folder(folder: Path):
         """Run the renaming operations for a single folder."""
-        for ext in FILE_EXTENSIONS:
+        for ext in cons.FILE_EXTENSIONS:
             # Fetch files and populate metadata list, then process them for renaming
             fetch_list_metadata(folder, ext)  # type: ignore
             # Process the files for metadata extraction, conflict resolution, and renaming
@@ -300,10 +296,10 @@ def run_media_renamer():
     # Process each year folder if YEARS is defined, otherwise process the base folder directly
     if len(YEARS) > 0:
         for yyyy in YEARS:
-            folder = Path(f"{BASE}{cons.SLASH}{yyyy}")
+            folder = Path(f"{cons.BASE}{yyyy}")
             run_folder(folder)
     else:
-        folder = BASE
+        folder = cons.BASE
         run_folder(folder)
 
     # Print the application footer to indicate the end of the process
