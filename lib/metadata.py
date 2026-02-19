@@ -67,7 +67,7 @@ def set_metadata(
     meta.actual_name = actual_name or meta.actual_name
     meta.date_taken = date_taken or meta.date_taken
     meta.date_taken_str = (
-        util.date_to_str(meta.date_taken) if date_taken else meta.date_taken_str
+        util.date_to_string(meta.date_taken) if date_taken else meta.date_taken_str
     )
     meta.new_name = new_name or meta.new_name
     meta.ext = ext or meta.ext

@@ -30,7 +30,7 @@ def trim_string(full_string: str, char: str) -> str:
     return trimmed_string
 
 
-def date_to_str(_date: date | None) -> Optional[str]:
+def date_to_string(_date: date | None) -> Optional[str]:
     """Convert date object to formatted string, or return None."""
     # If no date object, return None
     date_taken = _date.strftime(cons.NAME_FORMAT) if _date else None

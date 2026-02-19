@@ -4,6 +4,7 @@ import lib.metadata as meta
 from pathlib import Path
 from datetime import datetime
 
+APP_TITLE = "MEDIA RENAMER"
 MSG_PREFIX = "{no}- {name}" + str.rjust(">> ", 5)  # type: ignore
 LENGTH_PREFIX = 20
 
@@ -11,10 +12,10 @@ LENGTH_PREFIX = 20
 def print_app_header():
     """Print an app header for the start of the renaming process."""
     # Log the start of the renaming process with a timestamped header
-    log.info("\n" + cons.EQUAL * cons.LINE_LENGTH)
+    log.info(cons.ENTER + cons.EQUAL * cons.LINE_LENGTH)
     log.info(
         str.center(
-            f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - MEDIA RENAMER STARTED",
+            f"{datetime.now().strftime(cons.ISO_FORMAT)} - {APP_TITLE} STARTED",
             cons.LINE_LENGTH,
             " ",
         )
@@ -25,7 +26,7 @@ def print_app_footer():
     """Print an app footer for the end of the renaming process."""
     # Final log entry to indicate completion of the renaming process
     log.info(cons.EQUAL * cons.LINE_LENGTH)
-    log.info(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - MEDIA RENAMER FINISHED")
+    log.info(f"{datetime.now().strftime(cons.ISO_FORMAT)} - {APP_TITLE} FINISHED")
     log.info(cons.EQUAL * cons.LINE_LENGTH)
 
 
@@ -86,6 +87,16 @@ def print_name_remains_same(meta: meta.Metadata):
     )
 
 
+def print_file_path_none(meta: meta.Metadata):
+    """Print a message indicating the file path is None, which is an error."""
+    log.error(
+        str.ljust(
+            MSG_PREFIX.format(no=meta.no, name=meta.actual_full_name), LENGTH_PREFIX
+        )
+        + "Error: File path cannot be none!"
+    )
+
+
 def print_rename_error(meta: meta.Metadata):
     """Print a message indicating the rename operation failed."""
     log.error(
@@ -105,6 +116,3 @@ def setup_logger(app_name: str):
     """Set up the logger for the application."""
     global log
     log = logger.setup_logging(app_name)
-
-
-exc_file_not_found: Exception = Exception("Error: File path cannot be none!")

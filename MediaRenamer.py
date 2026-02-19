@@ -42,9 +42,9 @@ def find_file_date(meta_obj: meta.Metadata) -> Optional[date]:
     date_taken = None
 
     # Try EXIF or FFmpeg depending on file type
-    if ext in ["jpg", "heic"]:
+    if ext in cons.IMAGE_EXTENSIONS:
         date_taken = exif.get_date_taken(full_path)  # type: ignore
-    elif ext in ["mov", "mp4", "mpg", "gif"]:
+    elif ext in cons.VIDEO_EXTENSIONS:
         date_taken = ffmpeg.get_ffmpeg_date(str(full_path))
 
     # Always fallback to OS timestamps
@@ -71,7 +71,8 @@ def rename_all_files(only_conflicts: bool = cons.NO):
 
         # Safety check
         if not meta_obj.new_full_path:
-            raise msg.exc_file_not_found
+            msg.print_file_path_none(meta_obj)
+            exit(1)
 
         # Check if the new name is the same as the actual name to avoid unnecessary renaming
         same_name = meta_obj.new_full_name == meta_obj.actual_full_name
@@ -238,6 +239,7 @@ def fetch_list_metadata(folder: Path, ext: str):
     # then build Metadata objects for each file found
     for root, _, _ in os.walk(folder):
         cmd_dir = f'{CMD_DIR} "{root}{cons.SLASH}*.{ext}"'
+        folder = Path(root)
 
         try:
             # Execute directory listing command
@@ -248,7 +250,7 @@ def fetch_list_metadata(folder: Path, ext: str):
                 stderr=subprocess.DEVNULL,
             )
             # If no files found, skip to the next folder
-            msg.print_folder_title(Path(root))
+            msg.print_folder_title(folder)
 
             # Build metadata objects for each file found
             for i, file in enumerate(result.splitlines()):
@@ -258,7 +260,7 @@ def fetch_list_metadata(folder: Path, ext: str):
 
                 meta.set_metadata(
                     meta_obj,
-                    folder=Path(root),
+                    folder=folder,
                     initial_name=name,
                     actual_name=name,
                     ext=ext,
