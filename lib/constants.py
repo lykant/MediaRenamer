@@ -19,4 +19,5 @@ ISO_FORMAT = "%Y-%m-%d %H:%M:%S"
 IMAGE_EXTENSIONS = ["jpg", "heic"]
 VIDEO_EXTENSIONS = ["mov", "mp4", "mpg", "gif", "m4a"]
 FILE_EXTENSIONS = IMAGE_EXTENSIONS + VIDEO_EXTENSIONS
+
 BASE = Path("d:/Media/")

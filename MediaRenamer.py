@@ -272,14 +272,6 @@ def fetch_list_metadata(folder: Path, ext: str):
             continue
 
 
-# Constants
-APP_NAME = Path(__file__).stem
-
-# YEARS = [2026, 2027]
-YEARS = []
-CMD_DIR = "dir /B /o:d"
-
-
 def run_media_renamer():
     """Run the full renaming operations: fetch files, process them, and handle conflicts."""
 
@@ -308,10 +300,17 @@ def run_media_renamer():
     msg.print_app_footer()
 
 
+# Constants
+APP_NAME = Path(__file__).stem
+# YEARS = [2026, 2027]
+YEARS = []
+CMD_DIR = "dir /B /o:d"
+
 # Global variables
 list_metadata: list[meta.Metadata] = []
 dict_file_counts: dict[str, int] = {}
 
+###################
 # Start the renaming operations with logging enabled
 msg.setup_logger(APP_NAME)
 run_media_renamer()
